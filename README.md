@@ -19,16 +19,69 @@ The tool does not modify saved DBeaver connections or store tokens in its own co
 
 ## Requirements
 
-- Python 3.14+
+- Python 3.13+
+- `uv`
 - DBeaver installed locally
 - `gcloud` available in `PATH`
-- `make`
 - a valid Google Cloud login session
 - network access to the target database host
 
-## Installation
+Additional requirements for specific workflows:
 
-Using `uv`:
+- `git` — required for `uv tool install git+...` and `uvx --from git+...`
+- `make` — required for `make install_deps` and `make check`
+
+## Install and run
+
+### `uv tool`
+
+Install from the current repository checkout:
+
+```bash
+uv tool install .
+```
+
+Install directly from GitHub:
+
+```bash
+uv tool install git+https://github.com/hu553in/dbeaver-gcloud-free.git
+```
+
+Run:
+
+```bash
+dbgc
+```
+
+Upgrade:
+
+```bash
+uv tool upgrade dbeaver-gcloud-free
+```
+
+Remove:
+
+```bash
+uv tool uninstall dbeaver-gcloud-free
+```
+
+### `uvx`
+
+Run from the current repository checkout:
+
+```bash
+uvx --from . dbgc
+```
+
+Run directly from GitHub:
+
+```bash
+uvx --from git+https://github.com/hu553in/dbeaver-gcloud-free.git dbgc
+```
+
+### From a development checkout
+
+Create a development environment:
 
 ```bash
 make install_deps
@@ -42,9 +95,7 @@ source .venv/bin/activate
 python3 -m pip install questionary pyyaml pydantic
 ```
 
-## Usage
-
-Run:
+Run from the checkout:
 
 ```bash
 uv run python3 main.py
@@ -56,7 +107,7 @@ If you are not using `uv`, run:
 python3 main.py
 ```
 
-The launcher:
+## Run flow
 
 1. finds config files in `~/.config/dbeaver-gcloud-free/*.y*ml`
 2. asks which config to use
@@ -113,7 +164,7 @@ Each environment must contain:
 - `ip`
 - `port`
 
-## Behavior
+## Runtime behavior
 
 ### Temporary connections only
 
@@ -146,7 +197,7 @@ Invalid configs fail early, for example when:
 - `databases` is missing or empty
 - `port` is outside `1..65535`
 
-## Example launched command
+## Example command
 
 The script builds a command like this:
 
@@ -170,6 +221,5 @@ If `show-all-dbs: true` is enabled, the corresponding DBeaver connection propert
 Useful commands:
 
 ```bash
-make install_deps
 make check
 ```

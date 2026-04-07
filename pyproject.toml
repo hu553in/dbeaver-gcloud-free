@@ -2,7 +2,7 @@
 name = "dbeaver-gcloud-free"
 version = "0.1.0"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 authors = [{ name = "Ruslan Khasanshin" }]
 maintainers = [{ name = "Ruslan Khasanshin" }]
 
@@ -17,7 +17,11 @@ dev = [
   "ty>=0.0.28",
 ]
 
+[project.scripts]
+dbgc = "main:main"
+
 [tool.uv]
+default-groups = ["dev"]
 link-mode = "copy"
 
 [tool.ruff]
