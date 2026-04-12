@@ -29,7 +29,7 @@ The tool does not modify saved DBeaver connections or store tokens in its own co
 Additional requirements for specific workflows:
 
 - `git` — required for `uv tool install git+...` and `uvx --from git+...`
-- `make` — required for `make install_deps` and `make check`
+- `make` — required for `make install-deps` and `make check`
 
 ## Install and run
 
@@ -84,7 +84,7 @@ uvx --from git+https://github.com/hu553in/dbeaver-gcloud-free.git dbgc
 Create a development environment:
 
 ```bash
-make install_deps
+make install-deps
 ```
 
 Or with plain `python3` and `pip`:
