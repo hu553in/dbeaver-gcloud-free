@@ -11,9 +11,9 @@ dependencies = ["pydantic>=2.13.3", "pyyaml>=6.0.3", "questionary>=2.1.1"]
 [dependency-groups]
 dev = [
   "bandit>=1.9.4",
-  "prek>=0.3.10",
+  "prek>=0.3.11",
   "pysentry-rs>=0.4.5",
-  "ruff>=0.15.11",
+  "ruff>=0.15.12",
   "ty>=0.0.32",
 ]
 
