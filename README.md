@@ -31,7 +31,55 @@ Additional requirements for specific workflows:
 - `git` — required for `uv tool install git+...` and `uvx --from git+...`
 - `make` — required for `make install-deps` and `make check`
 
-## Install and run
+## Configuration
+
+Config files are discovered from:
+
+```bash
+~/.config/dbeaver-gcloud-free/*.y*ml
+```
+
+### Example config
+
+```yaml
+db-driver: postgresql
+dbeaver-bin: /Applications/DBeaver.app/Contents/MacOS/dbeaver
+
+envs:
+  - name: dev
+    ip: 10.15.20.25
+    port: 5432
+  - name: test
+    ip: 10.15.20.26
+    port: 5432
+
+user: awesome.user@gmail.com
+
+databases:
+  - some-db
+  - another-db
+
+show-all-dbs: true
+```
+
+### Config fields
+
+| Name           | Required | Default                                            | Description                                                |
+| -------------- | -------- | -------------------------------------------------- | ---------------------------------------------------------- |
+| `db-driver`    | No       | `postgresql`                                       | DBeaver driver ID                                          |
+| `dbeaver-bin`  | No       | `/Applications/DBeaver.app/Contents/MacOS/dbeaver` | Path to the DBeaver executable                             |
+| `envs`         | Yes      | –                                                  | Non-empty list of environments                             |
+| `user`         | Yes      | –                                                  | Database username passed to DBeaver                        |
+| `databases`    | Yes      | –                                                  | Non-empty list of database names                           |
+| `show-all-dbs` | No       | `false`                                            | Enables DBeaver's PostgreSQL "show all databases" property |
+
+Each environment must contain:
+
+- `name`
+- `ip`
+- `port`
+
+## Installation
 
 ### `uv tool`
 
@@ -115,54 +163,6 @@ python3 main.py
 4. asks which database to use
 5. runs `gcloud auth print-access-token`
 6. starts DBeaver with `-con`
-
-## Configuration
-
-Config files are discovered from:
-
-```bash
-~/.config/dbeaver-gcloud-free/*.y*ml
-```
-
-### Example config
-
-```yaml
-db-driver: postgresql
-dbeaver-bin: /Applications/DBeaver.app/Contents/MacOS/dbeaver
-
-envs:
-  - name: dev
-    ip: 10.15.20.25
-    port: 5432
-  - name: test
-    ip: 10.15.20.26
-    port: 5432
-
-user: awesome.user@gmail.com
-
-databases:
-  - some-db
-  - another-db
-
-show-all-dbs: true
-```
-
-### Config fields
-
-| Name           | Required | Default                                            | Description                                                |
-| -------------- | -------- | -------------------------------------------------- | ---------------------------------------------------------- |
-| `db-driver`    | No       | `postgresql`                                       | DBeaver driver ID                                          |
-| `dbeaver-bin`  | No       | `/Applications/DBeaver.app/Contents/MacOS/dbeaver` | Path to the DBeaver executable                             |
-| `envs`         | Yes      | –                                                  | Non-empty list of environments                             |
-| `user`         | Yes      | –                                                  | Database username passed to DBeaver                        |
-| `databases`    | Yes      | –                                                  | Non-empty list of database names                           |
-| `show-all-dbs` | No       | `false`                                            | Enables DBeaver's PostgreSQL "show all databases" property |
-
-Each environment must contain:
-
-- `name`
-- `ip`
-- `port`
 
 ## Runtime behavior
 
