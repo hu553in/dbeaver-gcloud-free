@@ -12,6 +12,7 @@ dependencies = ["pydantic>=2.13.4", "pyyaml>=6.0.3", "questionary>=2.1.1"]
 [dependency-groups]
 dev = [
   "bandit>=1.9.4",
+  "deptry>=0.25.1",
   "prek>=0.3.13",
   "pysentry-rs>=0.4.5",
   "ruff>=0.15.12",
@@ -61,3 +62,11 @@ fail_on = "low"
 
 [tool.pysentry.sources]
 enabled = ["pypa", "pypi", "osv"]
+
+[tool.deptry]
+known_first_party = ["main"]
+
+[tool.vulture]
+paths = ["main.py"]
+min_confidence = 100
+sort_by_size = true
