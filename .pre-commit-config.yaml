@@ -3,16 +3,16 @@ default_install_hook_types: [pre-commit, commit-msg]
 repos:
   - repo: local
     hooks:
-      - id: install-deps
-        name: install deps
-        entry: make install-deps
+      - id: check-types
+        name: check types
+        entry: make check-types
         language: system
         always_run: true
         pass_filenames: false
         stages: [pre-commit]
-      - id: check-types
-        name: check types
-        entry: make check-types
+      - id: deptry
+        name: deptry
+        entry: uv run deptry .
         language: system
         always_run: true
         pass_filenames: false
@@ -41,22 +41,17 @@ repos:
         stages: [pre-commit]
       - id: pretty-format-json
         stages: [pre-commit]
-        args: [--indent, '2', --autofix, --no-sort-keys, --no-ensure-ascii]
+        args: [--indent, "2", --autofix, --no-sort-keys, --no-ensure-ascii]
   - repo: https://github.com/pysentry/pysentry-pre-commit
     rev: v0.4.5
     hooks:
       - id: pysentry
         stages: [pre-commit]
-        args: ['.']
+        args: ["."]
   - repo: https://github.com/jendrikseipp/vulture
     rev: v2.16
     hooks:
       - id: vulture
-        stages: [pre-commit]
-  - repo: https://github.com/osprey-oss/deptry.git
-    rev: 0.25.1
-    hooks:
-      - id: deptry
         stages: [pre-commit]
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
@@ -78,7 +73,7 @@ repos:
       - id: ruff-format
         stages: [pre-commit]
   - repo: https://github.com/PyCQA/bandit
-    rev: '1.9.4'
+    rev: "1.9.4"
     hooks:
       - id: bandit
         stages: [pre-commit]
