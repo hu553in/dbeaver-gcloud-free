@@ -2,34 +2,40 @@
 
 [![CI](https://github.com/hu553in/dbeaver-gcloud-free/actions/workflows/ci.yml/badge.svg)](https://github.com/hu553in/dbeaver-gcloud-free/actions/workflows/ci.yml)
 
-A free local alternative to DBeaver's paid Google Cloud token flow. It opens a **temporary DBeaver
-connection** using a fresh token from `gcloud auth print-access-token`.
-
-It is meant for setups where a Google Cloud access token can be used as the database password and
-DBeaver does not handle that flow directly.
+Local launcher for opening a temporary DBeaver connection with a fresh token from
+`gcloud auth print-access-token`.
 
 ## What it does
 
-- Reads local YAML config files
-- Prompts for a config, environment, and database
-- Fetches a fresh Google Cloud access token
-- Starts DBeaver with a temporary connection
+- Reads connection presets from local YAML files
+- Prompts for config, environment, and database
+- Uses the current Google Cloud CLI session as the token source
+- Starts DBeaver with a temporary `-con` connection
 
-The tool does not modify saved DBeaver connections or store tokens in its own config.
+The tool does not change saved DBeaver connections and does not store tokens.
 
 ## Requirements
 
 - Python 3.13+
 - `uv`
-- DBeaver installed locally
-- `gcloud` available in `PATH`
-- a valid Google Cloud login session
-- network access to the target database host
+- DBeaver
+- `gcloud` in `PATH` with an active login session
+- Network access to the target database
+- `git` for installing from GitHub
 
-Additional requirements for specific workflows:
+## Setup
 
-- `git` - required for `uv tool install git+...` and `uvx --from git+...`
-- `make` - required for `make install-deps` and `make check`
+Install as a `uv` tool:
+
+```bash
+uv tool install git+https://github.com/hu553in/dbeaver-gcloud-free.git
+```
+
+Or run without installing:
+
+```bash
+uvx --from git+https://github.com/hu553in/dbeaver-gcloud-free.git dbgc
+```
 
 ## Configuration
 
@@ -39,7 +45,7 @@ Config files are discovered from:
 ~/.config/dbeaver-gcloud-free/*.y*ml
 ```
 
-### Example config
+Minimal config:
 
 ```yaml
 db-driver: postgresql
@@ -49,136 +55,60 @@ envs:
   - name: dev
     ip: 10.15.20.25
     port: 5432
-  - name: test
-    ip: 10.15.20.26
-    port: 5432
 
 user: awesome.user@gmail.com
 
 databases:
   - some-db
-  - another-db
 
 show-all-dbs: true
 ```
-
-### Config fields
 
 | Name           | Required | Default                                            | Description                                                |
 | -------------- | -------- | -------------------------------------------------- | ---------------------------------------------------------- |
 | `db-driver`    | No       | `postgresql`                                       | DBeaver driver ID                                          |
 | `dbeaver-bin`  | No       | `/Applications/DBeaver.app/Contents/MacOS/dbeaver` | Path to the DBeaver executable                             |
-| `envs`         | Yes      | -                                                  | Non-empty list of environments                             |
+| `envs`         | Yes      | -                                                  | List of environments with `name`, `ip`, and `port`         |
 | `user`         | Yes      | -                                                  | Database username passed to DBeaver                        |
-| `databases`    | Yes      | -                                                  | Non-empty list of database names                           |
+| `databases`    | Yes      | -                                                  | Database names shown in the prompt                         |
 | `show-all-dbs` | No       | `false`                                            | Enables DBeaver's PostgreSQL "show all databases" property |
 
-Each environment must contain:
-
-- `name`
-- `ip`
-- `port`
-
-## Installation
-
-### `uv tool`
-
-Useful commands:
+## Usage
 
 ```bash
-uv tool install .
-uv tool install git+https://github.com/hu553in/dbeaver-gcloud-free.git
 dbgc
-uv tool upgrade dbeaver-gcloud-free
-uv tool uninstall dbeaver-gcloud-free
 ```
 
-### `uvx`
-
-Useful commands:
+From a checkout:
 
 ```bash
-uvx --from . dbgc
-uvx --from git+https://github.com/hu553in/dbeaver-gcloud-free.git dbgc
+uv run dbgc
 ```
 
-### Development checkout
+The generated DBeaver connection uses:
 
-Useful commands:
-
-```bash
-make install-deps
-uv run python3 main.py
-make check
+```text
+driver=postgresql|host=10.15.20.25|port=5432|database=some-db|user=awesome.user@gmail.com|password=<fresh-token>|save=false|connect=true
 ```
-
-Or with plain `python3` and `pip`:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python3 -m pip install questionary pyyaml pydantic
-python3 main.py
-```
-
-## Execution flow
-
-1. Find config files in `~/.config/dbeaver-gcloud-free/*.y*ml`
-2. Ask which config to use
-3. Ask which environment to use
-4. Ask which database to use
-5. Run `gcloud auth print-access-token`
-6. Start DBeaver with `-con`
 
 ## Runtime behavior
 
-### Temporary connections only
+- Tokens come from `gcloud auth print-access-token`
+- Connections are temporary (`save=false`)
+- Config validation fails early for missing values and invalid ports
+- The local machine and user session should be treated as sensitive because the token is passed to
+  DBeaver as a launch argument
 
-The launcher always creates a temporary DBeaver connection:
-
-```text
-save=false
-```
-
-It does not overwrite saved DBeaver profiles.
-
-### Token source
-
-The token is taken from:
+## Development
 
 ```bash
-gcloud auth print-access-token
+make install-deps
+make check
 ```
 
-This requires an active `gcloud` authentication session.
+Focused checks:
 
-### Validation
-
-The config schema is validated with Pydantic.
-
-Invalid configs fail early, for example when:
-
-- `envs` is missing or empty
-- `user` is missing or empty
-- `databases` is missing or empty
-- `port` is outside `1..65535`
-
-## Example command
-
-The script builds a command like this:
-
-```text
-dbeaver -con "driver=postgresql|host=10.15.20.25|port=5432|database=some-db|user=awesome.user@gmail.com|password=<fresh-token>|name=GCloud: dev / 10.15.20.25:5432 / some-db|save=false|connect=true"
+```bash
+make lint
+make check-types
 ```
-
-If `show-all-dbs: true` is enabled, the corresponding DBeaver connection property is added as well.
-
-## Notes
-
-- The tool assumes the target database auth flow accepts `gcloud auth print-access-token` as the
-  password.
-- It does not verify network reachability before opening DBeaver.
-- It does not manage token refresh after DBeaver starts.
-- It is local and single-user in scope.
-- The token is passed to DBeaver as part of the launch arguments, so treat the local machine and
-  user session as sensitive.
