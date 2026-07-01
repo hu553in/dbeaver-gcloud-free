@@ -1,7 +1,7 @@
 [project]
 name = "dbeaver-gcloud-free"
 version = "0.1.0"
-description = "Free local alternative to DBeaver's paid Google Cloud token flow."
+description = "Local launcher for opening a temporary DBeaver connection with a fresh token from gcloud auth print-access-token."
 readme = "README.md"
 requires-python = ">=3.13"
 authors = [{ name = "Ruslan Khasanshin" }]
